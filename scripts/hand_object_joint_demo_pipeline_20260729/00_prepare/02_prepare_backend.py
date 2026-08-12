@@ -1,1 +1,0 @@
-../../rigid_stage00_prepare.py

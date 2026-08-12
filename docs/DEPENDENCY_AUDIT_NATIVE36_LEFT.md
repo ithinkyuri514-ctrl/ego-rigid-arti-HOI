@@ -4,7 +4,7 @@
 
 ## 结论
 
-代码不能只复制 mixed 入口脚本。入口会继续调用 rigid 后端，并导入 `vlm_sam2_recon/` 中的共享模块。交付时应按 `REQUIRED_CODE_NATIVE36_LEFT.txt` 保留脚本，并完整保留 `vlm_sam2_recon/` 源码包（排除 `__pycache__`）。
+代码不能只复制 mixed 入口脚本。入口会继续调用 rigid 后端，并导入 `vlm_sam2_recon/` 中的共享模块。交付时严格按 `REQUIRED_CODE_NATIVE36_LEFT.txt` 保留 34 个 accepted 主线脚本，并保留 `vlm_sam2_recon/` 共享源码包（排除 `__pycache__`）。
 
 即使代码齐全，GitHub 仓库本身也不能独立完成全流程：外部模型仓库、模型权重、SpatialMP4 原生扩展、FFmpeg 和多个阶段专用 Conda 环境仍需单独安装。
 
@@ -18,7 +18,7 @@
 - `scripts/rigid_stage08_track_pose.py`
 - `scripts/run_sam3d_objects_prompt.py`
 
-另外，交接文档中实际使用的 FoundationPose、EgoForce 导出、Stage 11 接触优化和可视化脚本也已统一加入清单。`scripts/run_rigid_hunyuan_from_mask.py` 是 object-mask server 可调用的兼容分支；accepted native36 结果使用 SAM3D，但保留该文件可避免服务器按钮路径缺失。
+另外，交接文档中实际使用的 FoundationPose、EgoForce 导出、支撑/事件门控、adaptive hand-object contact 和最终 Viser 脚本也已统一加入清单。Hunyuan、TRELLIS、WiLoR、PhysX、旧 Stage 11 接触链及诊断可视化均已从 Git 跟踪中移除。
 
 ## 外部仓库版本锁定
 

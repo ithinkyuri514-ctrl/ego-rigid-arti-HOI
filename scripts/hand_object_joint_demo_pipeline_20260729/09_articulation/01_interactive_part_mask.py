@@ -1,1 +1,0 @@
-../../mixed_stage04_articulate_part_masks.py

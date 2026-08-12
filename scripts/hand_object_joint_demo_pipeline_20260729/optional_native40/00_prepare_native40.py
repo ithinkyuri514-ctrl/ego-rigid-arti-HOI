@@ -1,1 +1,0 @@
-../../prepare_native_rgbd40_workspace.py

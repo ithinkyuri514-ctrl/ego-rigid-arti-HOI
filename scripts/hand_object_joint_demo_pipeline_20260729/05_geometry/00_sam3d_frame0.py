@@ -1,1 +1,0 @@
-../../mixed_stage03_sam3d_frame0.py

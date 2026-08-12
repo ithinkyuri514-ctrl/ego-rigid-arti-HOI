@@ -1,1 +1,0 @@
-../../mixed_stage06_frame0_depth.py

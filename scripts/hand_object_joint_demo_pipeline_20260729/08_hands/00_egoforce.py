@@ -1,1 +1,0 @@
-../../rigid_stage09_egoforce.py

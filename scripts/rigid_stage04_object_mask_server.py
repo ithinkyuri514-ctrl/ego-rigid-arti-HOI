@@ -8,10 +8,8 @@ import io
 import json
 import mimetypes
 import shutil
-import subprocess
 import sys
 import threading
-from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -76,7 +74,6 @@ HTML = r"""<!doctype html>
   <label><input id="fillHoles" type="checkbox" checked> 填内部孔洞</label>
   <button id="previewBtn">预览本帧</button>
   <button id="propagate" class="primary">传播并保存全视频</button>
-  <button id="hunyuan" class="api" disabled>运行混元3D</button>
 </header>
 <main>
   <section>
@@ -114,9 +111,8 @@ slider.addEventListener('input',()=>loadFrame(slider.value));frameNumber.addEven
 document.getElementById('pos').onclick=()=>setMode('positive');document.getElementById('neg').onclick=()=>setMode('negative');
 document.getElementById('undo').onclick=()=>{current()[mode+'_points'].pop();draw();};document.getElementById('clear').onclick=()=>{store[key()]={positive_points:[],negative_points:[]};draw();};
 document.getElementById('previewBtn').onclick=async()=>{try{statusEl.textContent='SAM2 本帧推理中...';const p=current();const data=await post('/api/preview',{frame_index:Number(slider.value),fill_holes:document.getElementById('fillHoles').checked,...p});previewEl.src=data.overlay_data_url;statusEl.textContent=`已记录条件帧 ${data.frame_index}\n${data.object_id} area=${data.area_pixels}`;}catch(e){statusEl.textContent=e.message;}};
-document.getElementById('propagate').onclick=async()=>{try{statusEl.textContent='正在双向传播并保存，请查看终端进度...';const data=await post('/api/propagate',{fill_holes:document.getElementById('fillHoles').checked});hasResults=true;document.getElementById('hunyuan').disabled=false;previewEl.src=`/result/${slider.value}?t=${Date.now()}`;statusEl.textContent=`完成 ${data.frame_count} 帧\nQC passed=${data.qc.passed}\nmask: ${data.prompt_mask}\nmanifest: ${data.manifest}`;}catch(e){statusEl.textContent=e.message;}};
-document.getElementById('hunyuan').onclick=async()=>{if(!confirm('将归档旧 mesh，并使用新 mask 调用混元3D API。继续？'))return;try{statusEl.textContent='混元3D API 运行中，请查看终端日志...';const data=await post('/api/hunyuan',{});statusEl.textContent=`混元3D 完成\nmesh: ${data.mesh_path}\narchive: ${data.archive||'none'}`;}catch(e){statusEl.textContent=e.message;}};
-fetch('/api/meta').then(r=>r.json()).then(x=>{meta=x;slider.max=x.frame_count-1;frameNumber.max=x.frame_count-1;hasResults=x.has_results;document.getElementById('hunyuan').disabled=(!hasResults)||(!x.hunyuan_enabled);if(!x.hunyuan_enabled)document.getElementById('hunyuan').style.display='none';statusEl.textContent=`${x.object_id}\n${x.frame_count} frames, ${x.width}x${x.height}, ${x.fps} FPS\nsource: ${x.frame_source||''}`;loadFrame(0);});
+document.getElementById('propagate').onclick=async()=>{try{statusEl.textContent='正在双向传播并保存，请查看终端进度...';const data=await post('/api/propagate',{fill_holes:document.getElementById('fillHoles').checked});hasResults=true;previewEl.src=`/result/${slider.value}?t=${Date.now()}`;statusEl.textContent=`完成 ${data.frame_count} 帧\nQC passed=${data.qc.passed}\nmask: ${data.prompt_mask}\nmanifest: ${data.manifest}`;}catch(e){statusEl.textContent=e.message;}};
+fetch('/api/meta').then(r=>r.json()).then(x=>{meta=x;slider.max=x.frame_count-1;frameNumber.max=x.frame_count-1;hasResults=x.has_results;statusEl.textContent=`${x.object_id}\n${x.frame_count} frames, ${x.width}x${x.height}, ${x.fps} FPS\nsource: ${x.frame_source||''}`;loadFrame(0);});
 </script></body></html>"""
 
 
@@ -249,8 +245,6 @@ class ObjectMaskService:
             and (self.output_dir / "mesh_prompt_frame0/rgb_no_hand.png").is_file()
         )
         self.lock = threading.Lock()
-        self.hunyuan_lock = threading.Lock()
-        self.hunyuan_enabled = bool(getattr(args, "enable_hunyuan", True))
 
     def load_model(self) -> None:
         print("Loading SAM2 video predictor...", flush=True)
@@ -277,7 +271,6 @@ class ObjectMaskService:
             "has_results": self.results_ready,
             "output_dir": str(self.output_dir),
             "frame_source": str(self.display_frames[0].parent),
-            "hunyuan_enabled": self.hunyuan_enabled,
         }
 
     @staticmethod
@@ -445,7 +438,7 @@ class ObjectMaskService:
             )
             try_update_compatible_stage_state(
                 self.workspace,
-                ("05_hunyuan_mesh", "05_sam3d_frame0_reconstruction", "03_sam3d_frame0_reconstruction"),
+                ("05_sam3d_frame0_reconstruction", "03_sam3d_frame0_reconstruction"),
                 "pending",
                 inputs=[str(prompt_dir / "rgb_no_hand.png"), str(prompt_dir / "object_mask.png")],
                 outputs=[],
@@ -466,54 +459,6 @@ class ObjectMaskService:
             "prompt_mask": str(prompt_dir / "object_mask.png"),
             "qc": qc,
         }
-
-    def run_hunyuan(self) -> dict:
-        if not self.hunyuan_enabled:
-            raise RuntimeError("This server was started with Hunyuan disabled for the mixed SAM3D pipeline.")
-        prompt_mask = self.output_dir / "mesh_prompt_frame0/object_mask.png"
-        prompt_rgb = self.output_dir / "mesh_prompt_frame0/rgb_no_hand.png"
-        if not self.results_ready:
-            raise RuntimeError("请先传播并确认全视频 mask")
-        if not prompt_mask.is_file() or not prompt_rgb.is_file():
-            raise FileNotFoundError("请先传播并保存全视频 mask")
-        with self.hunyuan_lock:
-            output_dir = self.workspace / "outputs/05_hunyuan_mesh"
-            archive = None
-            if output_dir.exists():
-                stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                archive = self.workspace / f"scratch/05_hunyuan_mesh_before_interactive_{stamp}"
-                shutil.copytree(output_dir, archive)
-                print(f"Archived previous Hunyuan output: {archive}", flush=True)
-            command = [
-                sys.executable,
-                str(PROJECT_ROOT / "scripts/run_rigid_hunyuan_from_mask.py"),
-                "--workspace",
-                str(self.workspace),
-                "--rgb",
-                str(prompt_rgb),
-                "--mask",
-                str(prompt_mask),
-                "--target-id",
-                self.object_id,
-                "--overwrite",
-            ]
-            print("$ " + " ".join(command), flush=True)
-            subprocess.run(command, cwd=PROJECT_ROOT, check=True)
-            record = read_json(output_dir / "hunyuan3d_run.json")
-            update_compatible_stage_state(
-                self.workspace,
-                ("07_frame0_mesh_alignment", "08_frame0_whole_part_icp_alignment"),
-                "pending",
-                inputs=[],
-                outputs=[],
-                notes="New interactive-mask Hunyuan mesh is ready; rerun metric mesh alignment.",
-            )
-            return {
-                "mesh_path": record["mesh_path"],
-                "archive": str(archive) if archive else None,
-                "run_record": str(output_dir / "hunyuan3d_run.json"),
-            }
-
 
 def handler_factory(service: ObjectMaskService):
     class Handler(BaseHTTPRequestHandler):
@@ -569,8 +514,6 @@ def handler_factory(service: ObjectMaskService):
                     self.send_json(service.preview(payload))
                 elif path == "/api/propagate":
                     self.send_json(service.propagate(payload))
-                elif path == "/api/hunyuan":
-                    self.send_json(service.run_hunyuan())
                 else:
                     self.send_json({"error": "not found"}, 404)
             except Exception as exc:

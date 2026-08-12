@@ -1,1 +1,0 @@
-../../rigid_stage08_track_pose.py

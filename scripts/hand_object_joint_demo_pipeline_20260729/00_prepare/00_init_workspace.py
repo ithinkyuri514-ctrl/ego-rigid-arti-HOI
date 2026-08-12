@@ -1,1 +1,0 @@
-../../init_mixed_interaction_workspace.py

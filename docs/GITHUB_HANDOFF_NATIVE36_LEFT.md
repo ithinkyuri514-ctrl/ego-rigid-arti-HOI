@@ -82,29 +82,22 @@ SpatialMP4 export
 
 完整运行目录应放到公司共享盘、对象存储或内部 Release asset，并在 README 中提供下载地址和 SHA256。
 
-## 4. 最小代码交付清单
+## 4. Accepted 代码交付清单
 
-当前项目没有 Git 历史，建议从干净目录创建新仓库。下面是该 mixed pipeline 的核心脚本，按阶段分组。
+GitHub 仅跟踪 `docs/REQUIRED_CODE_NATIVE36_LEFT.txt` 中列出的 accepted native36-left 主线代码。当前包括 34 个阶段入口/直接后端脚本、主线共享模块和 5 个核心测试；WiLoR、Hunyuan、TRELLIS、PhysX、native40、旧 demo、旧 Stage 11 接触链及诊断可视化不提交。
 
-### 4.1 工作区和原生 RGB-D
+### 4.1 工作区、原生 RGB-D 和事件理解
 
 ```text
 scripts/init_mixed_interaction_workspace.py
 scripts/mixed_stage00_prepare.py
 scripts/rigid_stage00_prepare.py
 scripts/prepare_native_rgbd_workspace.py
-scripts/prepare_native_rgbd40_workspace.py
 scripts/refine_camera_poses_static_rgbd.py
-```
-
-### 4.2 VLM 事件理解
-
-```text
 scripts/analyze_mixed_interactions_qwen3vl.py
-scripts/analyze_qwen3vl_hand_interaction.py
 ```
 
-### 4.3 手部 mask 和去手
+### 4.2 Mask、去手和 frame-0 SAM3D
 
 ```text
 scripts/mixed_stage02_hand_masks.py
@@ -114,69 +107,46 @@ scripts/rigid_stage02_hand_mask_server.py
 scripts/rigid_stage03_diffueraser.py
 scripts/mixed_stage03_sam3d_frame0.py
 scripts/run_sam3d_objects_prompt.py
-```
-
-`Stage 02` 的 SAM2 点选仍需要人工交互；脚本负责保存 prompt、传播 mask 和 QC。
-
-### 4.4 物体和 articulated part mask
-
-```text
 scripts/mixed_stage04_object_masks.py
 scripts/mixed_stage04_articulate_part_masks.py
 scripts/rigid_stage04_object_mask_server.py
 scripts/rigid_stage04_object_masks.py
 ```
 
-### 4.5 深度、mesh 和 frame-0 对齐
+Stage 02 和 Stage 04 的 SAM2 点选仍需要人工确认；Hunyuan 按钮及兼容调用已从 accepted object-mask server 删除。
+
+### 4.3 深度、对齐和运动跟踪
 
 ```text
 scripts/mixed_stage06_frame0_depth.py
 scripts/mixed_stage07_align_sam3d.py
-scripts/rigid_stage06_metric_dense_depth.py
-scripts/rigid_stage07_align_mesh.py
-```
-
-### 4.6 刚体和铰接物体运动
-
-```text
-scripts/mixed_stage08_track_rigid.py
-scripts/mixed_stage10_track_articulate_parts.py
 scripts/mixed_stage12_particulate.py
+scripts/mixed_stage10_track_articulate_parts.py
+scripts/rigid_stage08_track_pose.py
+scripts/mixed_stage08_track_rigid.py
 scripts/rigid_stage08_foundationpose_independent.py
 scripts/rigid_stage08_refine_foundationpose_icp.py
-scripts/rigid_stage08_track_pose.py
+```
+
+`prepare_native_rgbd_workspace.py` 生成全时间轴同步 native metric depth；`mixed_stage06_frame0_depth.py` 是 frame-0 对齐辅助步骤。
+
+### 4.4 约束、EgoForce 和手物优化
+
+```text
 scripts/constrain_articulated_part_body_contact.py
 scripts/constrain_rigid_pose_translation_only.py
 scripts/refine_terminal_rigid_contact_clearance.py
-scripts/gate_rigid_pose_by_interaction_event.py
 scripts/refine_mouse_support_on_articulated_part.py
-scripts/refine_rigid_support_on_static_part.py
-```
-
-### 4.7 EgoForce 和手物接触
-
-```text
+scripts/gate_rigid_pose_by_interaction_event.py
 scripts/rigid_stage09_egoforce.py
 scripts/export_egoforce_raw_all_c0.py
 scripts/adaptive_contact_optimize.py
-scripts/observation_contact_field_refine.py
-scripts/rigid_stage11_prepare_contact.py
-scripts/rigid_stage11_select_contact_anchor.py
-scripts/rigid_stage11_contact_optimize.py
-scripts/rigid_stage11_contact_qc.py
 ```
 
-### 4.8 可视化和 QC
+### 4.5 最终可视化
 
 ```text
-scripts/serve_microwave_bottle_full_scene_viser.py
 scripts/serve_full_scene_viser.py
-scripts/serve_mixed_frame0_viser.py
-scripts/serve_stage10_articulate_viser.py
-scripts/serve_articulate_iou_viser.py
-scripts/serve_egoforce_sequence_viser.py
-scripts/serve_alignment_hand_viser.py
-scripts/serve_rigid_stage08_viser.py
 ```
 
 ## 5. 外部仓库和 Conda 环境
@@ -618,17 +588,12 @@ mouse pose：outputs/11_object_object_support_mouse_laptop/mouse_poses_support_e
 hands：outputs/09_egoforce 或最终 hand-object optimization manifest
 ```
 
-启动前，先从最终 manifest 复制实际路径并确认存在。不同历史分支的 Viser 脚本参数不同，必须先运行：
+启动前，先从最终 manifest 复制实际路径并确认存在，然后查看 accepted Viser 参数：
 
 ```bash
 conda run -n egoforce python scripts/serve_full_scene_viser.py --help
 ```
 
-或使用对应场景的 Viser 脚本：
-
-```bash
-conda run -n egoforce python scripts/serve_dynamic_laptop_hand_viser.py --help
-```
 
 ## 12. 输出和复现检查
 

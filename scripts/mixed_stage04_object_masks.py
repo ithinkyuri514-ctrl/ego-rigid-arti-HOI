@@ -61,7 +61,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--offload-video-to-cpu", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--offload-state-to-cpu", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--check", action="store_true", help="Validate paths and selected object; do not load SAM2.")
-    parser.set_defaults(enable_hunyuan=False)
     return parser.parse_args()
 
 

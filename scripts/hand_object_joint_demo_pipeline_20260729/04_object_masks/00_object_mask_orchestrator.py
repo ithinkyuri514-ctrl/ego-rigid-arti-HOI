@@ -1,1 +1,0 @@
-../../mixed_stage04_object_masks.py

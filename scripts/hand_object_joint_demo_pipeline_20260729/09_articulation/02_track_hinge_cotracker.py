@@ -1,1 +1,0 @@
-../../mixed_stage10_track_articulate_parts.py

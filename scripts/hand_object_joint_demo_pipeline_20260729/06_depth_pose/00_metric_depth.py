@@ -1,1 +1,0 @@
-../../rigid_stage06_metric_dense_depth.py

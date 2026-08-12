@@ -1,1 +1,0 @@
-../../mixed_stage07_align_sam3d.py
