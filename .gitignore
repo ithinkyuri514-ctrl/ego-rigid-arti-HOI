@@ -1,0 +1,58 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Reconstruction inputs, outputs, and run artifacts
+/inputs/
+/outputs/
+/scratch/
+/run_*/
+/scripts/run_*/
+/current_pipeline_manifest.json
+
+# Model weights and large generated arrays
+checkpoints/
+weights/
+models/
+*.ckpt
+*.pth
+*.pt
+*.safetensors
+*.onnx
+*.npz
+
+# Raw/generated media and geometry
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.depth
+*.ply
+*.glb
+*.gltf
+*.obj
+*.stl
+
+# Native build products
+build/
+dist/
+*.so
+*.o
+*.a
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+*~

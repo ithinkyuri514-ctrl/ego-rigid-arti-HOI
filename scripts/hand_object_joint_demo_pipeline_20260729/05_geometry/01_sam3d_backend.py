@@ -1,0 +1,1 @@
+../../run_sam3d_objects_prompt.py

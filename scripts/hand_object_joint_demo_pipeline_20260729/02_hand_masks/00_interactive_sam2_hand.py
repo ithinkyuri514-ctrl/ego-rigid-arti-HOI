@@ -1,0 +1,1 @@
+../../rigid_stage02_hand_mask_server.py

@@ -1,0 +1,1 @@
+../../rigid_stage08_refine_foundationpose_icp.py

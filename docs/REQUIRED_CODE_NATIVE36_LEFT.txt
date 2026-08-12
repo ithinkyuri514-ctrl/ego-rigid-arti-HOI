@@ -1,0 +1,76 @@
+# Code handoff list for mixed_20260802_142359_native36_left
+# Copy these files into the GitHub repository; do not copy run_* outputs or checkpoints.
+# Keep the complete vlm_sam2_recon/ package because the scripts import shared modules transitively.
+
+# Workspace, native RGB-D, and event analysis
+scripts/init_mixed_interaction_workspace.py
+scripts/mixed_stage00_prepare.py
+scripts/rigid_stage00_prepare.py
+scripts/prepare_native_rgbd_workspace.py
+scripts/prepare_native_rgbd40_workspace.py
+scripts/refine_camera_poses_static_rgbd.py
+scripts/analyze_mixed_interactions_qwen3vl.py
+scripts/analyze_qwen3vl_hand_interaction.py
+
+# Hand masks, inpainting, object masks, and frame-0 mesh
+scripts/mixed_stage02_hand_masks.py
+scripts/mixed_stage02_propagate_masks.py
+scripts/mixed_stage02_sam2_frame0.py
+scripts/rigid_stage02_hand_mask_server.py
+scripts/rigid_stage03_diffueraser.py
+scripts/mixed_stage03_sam3d_frame0.py
+scripts/run_sam3d_objects_prompt.py
+scripts/mixed_stage04_object_masks.py
+scripts/mixed_stage04_articulate_part_masks.py
+scripts/rigid_stage04_object_mask_server.py
+scripts/rigid_stage04_object_masks.py
+# Compatibility branch callable from the object-mask server; not used by accepted SAM3D native36 result.
+scripts/run_rigid_hunyuan_from_mask.py
+
+# Depth, alignment, rigid/articulated tracking
+scripts/mixed_stage06_frame0_depth.py
+scripts/mixed_stage07_align_sam3d.py
+scripts/rigid_stage06_metric_dense_depth.py
+scripts/rigid_stage07_align_mesh.py
+scripts/mixed_stage08_track_rigid.py
+scripts/rigid_stage08_track_pose.py
+scripts/rigid_stage08_foundationpose_independent.py
+scripts/rigid_stage08_refine_foundationpose_icp.py
+scripts/mixed_stage10_track_articulate_parts.py
+scripts/mixed_stage12_particulate.py
+
+# EgoForce, constraints, and hand-object refinement
+scripts/rigid_stage09_egoforce.py
+scripts/export_egoforce_raw_all_c0.py
+scripts/constrain_articulated_part_body_contact.py
+scripts/constrain_rigid_pose_translation_only.py
+scripts/refine_terminal_rigid_contact_clearance.py
+scripts/gate_rigid_pose_by_interaction_event.py
+scripts/refine_mouse_support_on_articulated_part.py
+scripts/refine_rigid_support_on_static_part.py
+scripts/adaptive_contact_optimize.py
+scripts/observation_contact_field_refine.py
+scripts/rigid_stage11_prepare_contact.py
+scripts/rigid_stage11_select_contact_anchor.py
+scripts/rigid_stage11_contact_optimize.py
+scripts/rigid_stage11_contact_qc.py
+
+# Visualisation and QC
+scripts/serve_alignment_hand_viser.py
+scripts/serve_microwave_bottle_full_scene_viser.py
+scripts/serve_mixed_frame0_viser.py
+scripts/serve_rigid_stage08_viser.py
+scripts/serve_full_scene_viser.py
+scripts/serve_dynamic_laptop_hand_viser.py
+scripts/serve_stage10_articulate_viser.py
+scripts/serve_articulate_iou_viser.py
+scripts/serve_egoforce_sequence_viser.py
+
+# Shared source, configuration, documentation, and installation checker
+vlm_sam2_recon/
+configs/project.example.json
+CURRENT_PIPELINE.md
+docs/
+environment/requirements-common.txt
+environment/third_party.lock.json
+tools/check_native36_installation.py

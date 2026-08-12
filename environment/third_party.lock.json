@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "generated_for": "run_mixed_20260802_142359_native36_left",
+  "repositories": [
+    {
+      "name": "Qwen3-VL",
+      "url": "https://github.com/QwenLM/Qwen3-VL.git",
+      "commit": "96588727e44c78b25ba03ea03b8e12f7e64fd0da",
+      "env": "qwen3vl",
+      "required": true
+    },
+    {
+      "name": "SAM2",
+      "url": "https://github.com/facebookresearch/sam2.git",
+      "commit": "2b90b9f5ceec907a1c18123530e92e794ad901a4",
+      "env": "sam3d-objects/arthoi",
+      "required": true
+    },
+    {
+      "name": "SAM3D Objects",
+      "url": "https://github.com/facebookresearch/sam-3d-objects.git",
+      "commit": "f91db411c50efee93d8db7aeb323885650f6f722",
+      "env": "sam3d-objects",
+      "required": true
+    },
+    {
+      "name": "DiffuEraser",
+      "url": "https://github.com/lixiaowen-xw/diffueraser",
+      "commit": "8e6f279ac7531e27ad1849c6f8dab5372a8597e7",
+      "env": "diffueraser",
+      "required": true
+    },
+    {
+      "name": "ArtHOI-4D-Reconstruction",
+      "url": "https://github.com/hitcs-zikaiwang/ArtHOI-4D-Reconstruction.git",
+      "commit": "33cfbb6367afb6d076122d9aa2c2a5f9c467781c",
+      "env": "arthoi",
+      "required": true
+    },
+    {
+      "name": "Particulate",
+      "url": "https://github.com/RuiningLi/particulate.git",
+      "commit": "9cf7f6116ee5ca2e1bf54dbc798d220810bb47ca",
+      "env": "particulate",
+      "required": true
+    },
+    {
+      "name": "EgoForce",
+      "url": "https://github.com/dfki-av/EgoForce.git",
+      "commit": "79fb146499c93979e118eba136d6538df29685ff",
+      "env": "egoforce",
+      "required": true
+    },
+    {
+      "name": "CoTracker",
+      "url": "https://github.com/facebookresearch/co-tracker",
+      "commit": "82e02e8029753ad4ef13cf06be7f4fc5facdda4d",
+      "env": "arthoi",
+      "required": true
+    },
+    {
+      "name": "FoundationPose",
+      "url": "https://github.com/NVlabs/FoundationPose",
+      "commit": "a1b694b83e633c2cb6115b9063d940a687759392",
+      "env": "arthoi",
+      "required": true
+    },
+    {
+      "name": "SpatialMP4",
+      "url": "https://github.com/Pico-Developer/SpatialMP4",
+      "commit": "da721695829a0e947930f9b7f1a254dd695fb794",
+      "env": "native build",
+      "required": true
+    }
+  ]
+}

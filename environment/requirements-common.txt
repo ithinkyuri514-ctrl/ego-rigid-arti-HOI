@@ -1,0 +1,14 @@
+# Common geometry / visualization imports used by the native36 handoff scripts.
+# Model-specific repositories must still be installed in their own Conda environments.
+numpy
+scipy
+opencv-python
+Pillow
+trimesh
+open3d
+PyYAML
+yacs
+viser
+requests
+torch
+torchvision

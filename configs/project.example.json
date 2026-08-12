@@ -1,0 +1,25 @@
+{
+  "project_root": "/code/vlm_sam2_recon",
+  "manifest_path": "outputs/project_manifest.json",
+  "sequence": {
+    "sequence_id": "3DVideo_2026-07-01-19-24-06-667_spatialmp4_export",
+    "frame_dir": "/code/3DVideo_2026-07-01-19-24-06-667_spatialmp4_export/rgb_right_png",
+    "camera_id": "rgb_right",
+    "raw_fps": null,
+    "sample_fps": null
+  },
+  "models": {
+    "qwen3_vl": "/code/models/Qwen3-VL-8B-Instruct",
+    "sam2_root": "/code/sam2",
+    "sam2_checkpoint": "/code/ArtHOI-4D-Reconstruction/third_party/sam2/checkpoints/sam2.1_hiera_large.pt",
+    "trellis2": "/code/TRELLIS.2",
+    "physxomni": "/code/PhysX-Omni",
+    "egoforce": null
+  },
+  "outputs": {
+    "sam2_masks": "outputs/sam2_masks",
+    "trellis2_interface": "outputs/trellis2_interface",
+    "physxomni": "outputs/physxomni",
+    "egoforce": "outputs/egoforce_rgb_right"
+  }
+}

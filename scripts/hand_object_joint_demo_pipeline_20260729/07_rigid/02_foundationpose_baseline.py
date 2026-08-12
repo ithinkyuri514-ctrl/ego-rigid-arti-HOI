@@ -1,0 +1,1 @@
+../../rigid_stage08_foundationpose_independent.py
